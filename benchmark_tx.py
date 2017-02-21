@@ -115,11 +115,14 @@ class payload_mgr(threading.Thread):
         self.alpha = 97
         self.stop = 0
         self.type = 0    #0:beacon, 1:data
-        self.hop_interval = 1000
+        self.hop_interval = 500
         self.startSlot = startSlot
         self.tb = tb
         self.lock = lock
+        self.feature_detect = 0
         super(payload_mgr, self).__init__(name = threadName)
+        self.count = 0
+        self.feature_count = 0
 
     def reset(self):    #parameter for the new timeslot
     	self.type = 0
@@ -132,6 +135,9 @@ class payload_mgr(threading.Thread):
     def run(self):
         global pktno
         while 1:
+            self.feature_detect = self.tb.rxpath.get_variable_function_probe_0()
+
+            
             if self.stop == 0:
    
                 if self.type == 0:
@@ -146,7 +152,7 @@ class payload_mgr(threading.Thread):
                     elif (97 <= self.alpha <= 121):
                         self.alpha = self.alpha + 1
                     print "    pkt #: " + payload[1:4] + "   packet content: " + payload[4:] + "   frequency(MHz): " + str(self.tb.freq/1e6)
-                time.sleep(0.5)    #a cycle fo transmit and receive ack 
+                time.sleep(0.05)    #a cycle fo transmit and receive ack 
 
     def get_syncBeacon(self):
         rt = str(abs(self.getRemainTime()))
@@ -257,19 +263,17 @@ def main():
         #global rx_callback_enable, trans_status, get_ack, randombackoff, ttRB, difscount, DIFS
         #trans_status = 0   #at the new frame, start with a beacon 
         #rx_callback_enable = 0
-        time.sleep(1)
-        if (myPay.tb.rxpath.variable_function_probe_0 != 0):
-            myPay.tb.count_detect = myPay.tb.count_detect + 1
-            if (myPay.tb.count_detect > 2):
-                myPay.tb.change_freq();
-                myPay.tb.set_tx_freq(myPay.tb.freq)
-                myPay.tb.set_rx_freq(myPay.tb.freq)
-                myPay.tb.count_detect = 0;
-        else:
-            myPay.tb.count_detect = 0;
-        #print " rxpath.variable_function_probe_0 = "+ str(myPay.tb.rxpath.variable_function_probe_0) 
-        
-        #print "the end of an interval"
+        time.sleep(0.499)
+        myPay.pause()
+        time.sleep(0.001)
+        detection = myPay.feature_detect
+        myPay.reset()
+        if (detection != 0):
+            myPay.tb.change_freq();
+            myPay.tb.set_tx_freq(myPay.tb.freq)
+            myPay.tb.set_rx_freq(myPay.tb.freq)
+            print "             frequency changes"
+
         myPay.pause()
         myPay.reset()
         myPay.startSlot = datetime.datetime.now()

@@ -53,7 +53,7 @@ class receive_path(gr.hier_block2):
                 val = self.blocks_probe_signal_x_0.level()
                 try: self.set_variable_function_probe_0(val)
                 except AttributeError, e: pass
-                time.sleep(1.0/(1000000))
+                time.sleep(1.0/(10000))
         _variable_function_probe_0_thread = threading.Thread(target=_variable_function_probe_0_probe)
         _variable_function_probe_0_thread.daemon = True
         _variable_function_probe_0_thread.start()
@@ -69,6 +69,7 @@ class receive_path(gr.hier_block2):
         alpha = 1 # the time interval of collecting data
         thresh = 30   # in dB, will have to adjust
         self.probe = analog.probe_avg_mag_sqrd_c(thresh,alpha)
+        self.myprobe = analog.probe_avg_mag_sqrd_f(thresh,alpha)# this is the probe we used.
         self.csprobe = analog.probe_avg_mag_sqrd_c(25, alpha)
 
         self.connect((self, 0), self.ofdm_rx)
@@ -80,6 +81,9 @@ class receive_path(gr.hier_block2):
         # Display some information about the setup
         if self._verbose:
             self._print_verbage()
+
+    #def featuredetect_level(self):#20150521 return myprobe value
+    #    return self.blocks_probe_signal_x_0.level()
 
     def get_variable_function_probe_0(self):
         return self.variable_function_probe_0

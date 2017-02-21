@@ -116,7 +116,7 @@ def main():
                 #print " receiving beacon: "+payload[0:]
                 #print "receiving beacon "
             elif payload[0] == 'D':
-                print "    pkt #: " + payload[1:4] + "   packet content: " + payload[4:] + "   frequency(MHz): "+str(tb.freq)
+                print "    pkt #: " + payload[1:4] + "   packet content: " + payload[4:] + "   frequency(MHz): "+str(tb.freq/1e6)
                 check_beacon_count=0
                    
                 '''
@@ -131,7 +131,7 @@ def main():
                 for i in range(0,10):
                     send_pkt('a' + str(pktno_receive))
                     print "receiving data" + str(pktno_receive)
-  
+             
                 pktno_receive = ''
                
             elif payload[0] == 'F':
@@ -200,9 +200,13 @@ def main():
             tb.set_tx_freq(tb.freq)
             tb.set_rx_freq(tb.freq)
             check_beacon_count =0
+            print "\n"
+            print "             Dose not receive any beacons"
+            print "\n"
+
             #myPay.
         #n += len(payload)
-        sys.stderr.write('.')
+            #sys.stderr.write('.')
         #if options.discontinuous and pktno % 5 == 4:
         #    time.sleep(1)
         
@@ -210,7 +214,7 @@ def main():
         #time.sleep(0.1)
         #check.beacon = ''
         #print "the end of the interval"    
-        pktno += 1
+            #pktno += 1
         
     send_pkt(eof=True)
     tb.wait()                       # wait for it to finish
