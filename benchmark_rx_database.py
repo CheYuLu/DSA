@@ -88,11 +88,13 @@ class my_top_block(gr.top_block):
 
     def change_freq(self):
         self.freq =(self.freq>(self.ch1+self.ch2)/2)*self.ch1+(self.freq<(self.ch1+self.ch2)/2)*self.ch2
+    def change_freq1(self, frequency):
+        self.freq = frequency
 # /////////////////////////////////////////////////////////////////////////////
 #                               freq_mgr
 # /////////////////////////////////////////////////////////////////////////////
 class frequency_mgr:
-    def __ init__(self, tb, options):
+    def __init__(self, tb, options):
         self.frequency = options.tx_freq
         self.tb = tb
     def query_database(self):
@@ -135,7 +137,7 @@ class frequency_mgr:
         #    print  "TX is at ", int(self.frequency/1e6),"MHz"
         #    print "\n"
         #    print "========================================================" 
-
+        self.tb.change_freq1(self.frequency)
         self.tb.set_tx_freq(self.frequency)
         self.tb.set_rx_freq(self.frequency)
 
@@ -151,6 +153,8 @@ def main():
         
     n_rcvd = 0
     n_right = 0
+
+ 
     def rx_callback(ok, payload):
         global n_rcvd, n_right, pktno, pktno_receive, check_beacon_count
         n_rcvd += 1
