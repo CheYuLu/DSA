@@ -73,7 +73,7 @@ class my_top_block(gr.top_block):
         # do this after for any adjustments to the options that may
         # occur in the sinks (specifically the UHD sink)
         self.sink.set_sample_rate(640000)#rx sample rate
-        self.source.set_sample_rate(1500000)
+        self.source.set_sample_rate(640000)
         self.rxpath = receive_path(callback, options)
         self.txpath = transmit_path(options)
         self.connect(self.source, self.rxpath)
