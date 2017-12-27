@@ -18,9 +18,12 @@
 # along with GNU Radio; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-# 
+#
+# datadbase stuff 
 import psycopg2 as psy
 import psycopg2.extras as ex
+import MySQLdb
+
 from gnuradio import gr, blks2
 from gnuradio import eng_notation
 from gnuradio.eng_option import eng_option
@@ -139,6 +142,7 @@ class payload_mgr(threading.Thread):
         self.count = 0
         self.feature_count = 0
 
+    
     def query_database(self):
         
         mydata=[('24','zero'),('26','one'),('28', 'two')]    #The first is the var name the second is the value
@@ -184,7 +188,9 @@ class payload_mgr(threading.Thread):
             #print "Primary user is absent... start..."
         else:
             response = urllib2.urlopen(self.tUrl+str(int(cha))+'&status='+str(1)+'&remark='+str(1111))
-            
+    
+    def channl_hopping_by_modifing_mine_database(self, channel):
+        response = urllib2.urlopen(self.tUrl+str(int(channel))+'&status='+str(0)+'&remark='+str(300))
 
     def reset(self):    #parameter for the new timeslot
     	self.type = 0
@@ -260,6 +266,8 @@ def main():
 		cur.close()
 		conn.close()
                 
+    
+    
 
     def rx_callback(ok, payload):
        
@@ -335,6 +343,7 @@ def main():
     tb.start()                      # start flow graph
     count_detect = 0
     if_update =0
+    myPay.channl_hopping_by_modifing_mine_database("2301") 
     while True:
         #print'fuck' 
         #???bout.waitime = -1
@@ -354,12 +363,13 @@ def main():
         else:
             count_detect=0
             #update()
-        if count_detect==2 and if_update ==0:
+        if count_detect>1 and if_update ==0:
             print "Primary user is present... start..."
             print 'update to the database'
             update()
             tb.set_tx_freq(600e6)
-            tb.set_rx_freq(600e6)            
+            tb.set_rx_freq(600e6)
+            myPay.channl_hopping_by_modifing_mine_database("41")  #41 is 600MHz (means that stop transmission)   
             if_update= 1
             count_detect =0
             break
